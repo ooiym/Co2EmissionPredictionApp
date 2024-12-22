@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 import joblib
-
+from sklearn.preprocessing import OneHotEncoder
 # Load the trained LightGBM model
 model = joblib.load('sgd_best_model.pkl')
 encoder = OneHotEncoder(sparse_output=False, handle_unknown='ignore') # Create encoder
