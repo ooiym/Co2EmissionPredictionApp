@@ -3,7 +3,7 @@ import pandas as pd
 import joblib
 
 # Load the trained LightGBM model
-model = joblib.load('E:\Ymooi\Downloads\sgd_best_model.pkl')  # Ensure the model is saved after training
+model = joblib.load('sgd_best_model.pkl')  # Ensure the model is saved after training
 
 # Title of the app
 st.title("CO2 Emission Prediction App")
