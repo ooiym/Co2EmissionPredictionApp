@@ -3,7 +3,8 @@ import pandas as pd
 import joblib
 
 # Load the trained LightGBM model
-model = joblib.load('sgd_best_model.pkl')  # Ensure the model is saved after training
+model = joblib.load('sgd_best_model.pkl')
+encoder = OneHotEncoder(sparse_output=False, handle_unknown='ignore') # Create encoder
 
 # Title of the app
 st.title("CO2 Emission Prediction App")
@@ -24,7 +25,13 @@ if st.button("Predict"):
         try:
             # Preprocess the input data
             year_ordinal = pd.to_datetime(f"{int(year)}-01-01").toordinal()
-            input_data = pd.DataFrame({'area': [area], 'year': [year_ordinal]})
+            
+            # One-Hot Encode the 'area'
+            area_encoded = encoder.fit_transform(pd.DataFrame({'area': [area]})) 
+            
+            # Create input DataFrame with encoded 'area' and 'year'
+            input_data = pd.DataFrame({'year': [year_ordinal]}) # DataFrame for year
+            input_data = pd.concat([pd.DataFrame(area_encoded), input_data], axis=1)
             
             # Make predictions
             prediction = model.predict(input_data)[0]
