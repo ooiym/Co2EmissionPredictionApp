@@ -2,11 +2,6 @@ import streamlit as st
 import pandas as pd
 import joblib
 from sklearn.preprocessing import OneHotEncoder
-
-import joblib
-
-joblib.dump(preprocessor, 'preprocessor.pkl')
-
 # Load all models into a dictionary
 models = {
     "SGD": joblib.load('sgd_best_model.pkl'),
