@@ -12,7 +12,13 @@ models = {
 }
 preprocessor = joblib.load('preprocessor.pkl')
 scaler = joblib.load('scaler.pkl')  # Load the scaler
-
+# Load areas from text file
+try:
+    with open('areas.txt', 'r') as file:
+        area_list = [line.strip() for line in file if line.strip()]
+except FileNotFoundError:
+    st.error("The 'areas.txt' file is missing. Please add it to the working directory.")
+    area_list = []
 # Title of the app
 st.title("CO2 Emission Prediction App")
 
@@ -26,7 +32,8 @@ Please enter the values below to get the prediction.
 model_choice = st.selectbox("Select Model:", ["All Models"] + list(models.keys()))
 
 # Input form for Area and Year
-area = st.text_input("Enter the Area (e.g., Country or Region):")
+# Dropdown for Area Selection
+area = st.selectbox("Select the Area:", area_list)
 year = st.number_input("Enter the Year (e.g., 2023):", min_value=1900, max_value=2100, step=1)
 
 if st.button("Predict"):
