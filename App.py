@@ -43,8 +43,9 @@ if st.button("Predict"):
             new_data = pd.DataFrame({'area': [area], 'year': [year]})
             
             # 1. Transform using preprocessor (includes encoding and column handling):
-            new_data_transformed = preprocessor.transform(new_data)
-            
+            #new_data_transformed = preprocessor.transform(new_data)
+            new_data_encoded = pd.get_dummies(new_data, columns=['area'], drop_first=True)
+
             # 2. Convert to DataFrame with correct column names:
             feature_names = preprocessor.get_feature_names_out() 
             new_data_encoded = pd.DataFrame(new_data_transformed, columns=feature_names)
@@ -52,13 +53,8 @@ if st.button("Predict"):
             # 3. Scale features:
             new_data_scaled = scaler.transform(new_data_encoded)
             # Handle missing columns (if any) to match training data:
-            #missing_cols = set(feature_names) - set(new_data_encoded.columns)
-            #missing_data = pd.DataFrame(0, index=new_data_encoded.index, columns=list(missing_cols))
-            # Add missing columns with default values (e.g., 0):
-            missing_cols = ['food_retail', 'food_transport', 'food_household_consumption', 'urban_population', 'fires_in_humid_tropical_forests', 'food_packaging', 'manure_left_on_pasture', 'savanna_fires', 'rural_population', 'food_processing', 'forestland', 'average_temperature_°c', 'total_population_-male', 'rice_cultivation', 'net_forest_conversion', 'total_population-female', 'pesticides_manufacturing', 'on-farm_electricity_use', 'fires_in_organic_soils', 'fertilizers_manufacturing', 'agrifood_systems_waste_disposal', 'forest_fires', 'drained_organic_soils(co2)']
-            for col in missing_cols:
-                new_data[col] = 0  # or another appropriate default value
-
+            missing_cols = set(feature_names) - set(new_data_encoded.columns)
+            missing_data = pd.DataFrame(0, index=new_data_encoded.index, columns=list(missing_cols))
             new_data_encoded = pd.concat([new_data_encoded, missing_data], axis=1)
             new_data_encoded = new_data_encoded[feature_names]  # Reorder columns to match training data
 
