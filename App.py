@@ -69,6 +69,7 @@ if st.button("Predict"):
                 # Optionally, display as a DataFrame
                 st.write("Prediction Summary:")
                 results_df = pd.DataFrame.from_dict(results, orient='index', columns=['Prediction'])
+                results_df['Prediction'] = results_df['Prediction'].map(lambda x: f"{x:.2f}")  # Format as string with two decimals
                 st.dataframe(results_df)
             else:
                 # Get the selected model and make a prediction
