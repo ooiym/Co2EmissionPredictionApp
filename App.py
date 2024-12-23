@@ -2,9 +2,16 @@ import streamlit as st
 import pandas as pd
 import joblib
 from sklearn.preprocessing import OneHotEncoder
-# Load the trained LightGBM model
-model = joblib.load('sgd_best_model.pkl')
-encoder = OneHotEncoder(sparse_output=False, handle_unknown='ignore') # Create encoder
+
+
+# Load all models into a dictionary
+models = {
+    "SGD": joblib.load('sgd_best_model.pkl'),
+    "LightGBM": joblib.load('lgb_best_model.pkl'),
+    # Add more models here in the future...
+}
+
+encoder = OneHotEncoder(sparse_output=False, handle_unknown='ignore')
 
 # Title of the app
 st.title("CO2 Emission Prediction App")
@@ -15,6 +22,9 @@ This app predicts the **Total CO2 Emission** based on the Area and Year input.
 Please enter the values below to get the prediction.
 """)
 
+# Model Selection (get model names from the dictionary keys)
+model_choice = st.selectbox("Select Model:", list(models.keys()))
+
 # Input form for Area and Year
 area = st.text_input("Enter the Area (e.g., Country or Region):")
 year = st.number_input("Enter the Year (e.g., 2023):", min_value=1900, max_value=2100, step=1)
@@ -23,23 +33,33 @@ year = st.number_input("Enter the Year (e.g., 2023):", min_value=1900, max_value
 if st.button("Predict"):
     if area and year:
         try:
-            # Preprocess the input data
-            year_ordinal = pd.to_datetime(f"{int(year)}-01-01").toordinal()
-            
-            # One-Hot Encode the 'area'
-            area_encoded = encoder.fit_transform(pd.DataFrame({'area': [area]})) 
-            
-            # Create input DataFrame with encoded 'area' and 'year'
-            input_data = pd.DataFrame({'year': [year_ordinal]}) # DataFrame for year
-            input_data = pd.concat([pd.DataFrame(area_encoded), input_data], axis=1)
-            
-            # Make predictions
-            prediction = model.predict(input_data)[0]
+            # 1. Create a DataFrame for the new data
+            new_data = pd.DataFrame({'area': [area], 'year': [year]})
 
-            # Display the result
-            st.success(f"Predicted Total CO2 Emission: {prediction:.2f}")
+            # 2. Preprocess the new data (similar to your code)
+            new_data_encoded = pd.get_dummies(new_data, columns=['area'], drop_first=True)
+
+            feature_names = preprocessor.get_feature_names_out()
+
+            missing_cols = set(feature_names) - set(new_data_encoded.columns)
+            missing_data = pd.DataFrame(0, index=new_data_encoded.index, columns=list(missing_cols))
+            new_data_encoded = pd.concat([new_data_encoded, missing_data], axis=1)
+
+            new_data_encoded = new_data_encoded[feature_names]
+
+            new_data_encoded['year'] = pd.to_datetime(new_data_encoded['year'], format='%Y').apply(lambda date: date.toordinal()) # Convert 'year' to ordinal
+
+            new_data_scaled = scaler.transform(new_data_encoded)  # Scale the data
+
+            # 3. Get the selected model from the dictionary
+            model = models[model_choice]
+
+            # 4. Make predictions
+            prediction = model.predict(new_data_scaled)[0]
+
+            # 5. Display the result
+            st.success(f"Predicted Total CO2 Emission for {area} in {year}: {prediction:.2f}")
         except Exception as e:
             st.error(f"Error during prediction: {e}")
     else:
         st.warning("Please provide valid inputs for both Area and Year.")
-
