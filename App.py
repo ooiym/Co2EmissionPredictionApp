@@ -12,49 +12,48 @@ preprocessor = joblib.load('preprocessor.pkl')
 
 encoder = OneHotEncoder(sparse_output=False, handle_unknown='ignore')
 
-# Load areas from text file
-try:
-    with open('areas.txt', 'r') as file:
-        area_list = [line.strip() for line in file if line.strip()]
-except FileNotFoundError:
-    st.error("The 'areas.txt' file is missing. Please add it to the working directory.")
-    area_list = []
-
 # Title of the app
 st.title("CO2 Emission Prediction App")
 
 # Instructions for the user
 st.write("""
 This app predicts the **Total CO2 Emission** based on the Area and Year input.
-Please select an area from the dropdown and enter the year to get the prediction.
+Please enter the values below to get the prediction.
 """)
 
 # Model Selection (get model names from the dictionary keys)
 model_choice = st.selectbox("Select Model:", list(models.keys()))
 
-# Dropdown for Area Selection
-area = st.selectbox("Select the Area:", area_list)
-
-# Input for Year
+# Input form for Area and Year
+area = st.text_input("Enter the Area (e.g., Country or Region):")
 year = st.number_input("Enter the Year (e.g., 2023):", min_value=1900, max_value=2100, step=1)
 
-# Prediction Button
+
+# Streamlit App ...
+
 if st.button("Predict"):
     if area and year:
         try:
             # 1. Create DataFrame
             new_data = pd.DataFrame({'area': [area], 'year': [year]})
-            
-            # Preprocess the data using the original preprocessor
+            # convert year to datetime format
+            new_data['Year'] = pd.to_datetime(new_data['Year'], format='%Y')
+            #standardize Column Names
+            new_data.columns = new_data.columns.str.strip().str.lower().str.replace(' ', '_').str.replace('\W', '')
+
+            # 2. Preprocess using the ORIGINAL preprocessor
             new_data_transformed = preprocessor.transform(new_data)
-            
-            # 2. Get selected model
+            # Convert 'year' to ordinal before scaling
+            new_data_encoded['year'] = pd.to_datetime(new_data_encoded['year'], format='%Y', errors='coerce').apply(lambda date: date.toordinal() if pd.notnull(date) else 0)
+            new_data_encoded['year'] = pd.to_numeric(new_data_encoded['year'], errors='coerce').fillna(0).astype(int)  # Ensure numerical type
+
+            # 3. Get selected model
             model = models[model_choice]
 
-            # 3. Make predictions
+            # 4. Make predictions
             prediction = model.predict(new_data_transformed)[0]  # Use transformed data
 
-            # 4. Display result
+            # 5. Display result
             st.success(f"Predicted Total CO2 Emission for {area} in {year}: {prediction:.2f}")
         except Exception as e:
             st.error(f"Error during prediction: {e}")
