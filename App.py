@@ -44,7 +44,7 @@ if st.button("Predict"):
 
             # Encode 'area':
             new_data_encoded = pd.get_dummies(new_data, columns=['area'], drop_first=True)
-
+            new_data_encoded = preprocessor.transform(new_data)
             # Get feature names from ColumnTransformer
             feature_names = preprocessor.get_feature_names_out()
 
