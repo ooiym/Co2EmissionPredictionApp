@@ -46,6 +46,7 @@ if st.button("Predict"):
             new_data_encoded = new_data_encoded[feature_names]
             # Convert 'year' to ordinal before scaling
             new_data_encoded['year'] = pd.to_datetime(new_data_encoded['year'], format='%Y', errors='coerce').apply(lambda date: date.toordinal() if pd.notnull(date) else 0) 
+            st.write("Datatype of 'year' after convert:", new_data['year'].dtypes) 
             # Scale the data
             new_data_scaled = scaler.transform(new_data_encoded)
             # 3. Get the selected model from the dictionary
