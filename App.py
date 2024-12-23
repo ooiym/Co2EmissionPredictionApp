@@ -69,7 +69,8 @@ if st.button("Predict"):
                 # Optionally, display as a DataFrame
                 st.write("Prediction Summary:")
                 results_df = pd.DataFrame.from_dict(results, orient='index', columns=['Prediction'])
-                results_df['Prediction'] = results_df['Prediction'].map('{:.2f}'.format)  # Format to 2 decimal places
+                results_df['Prediction'] = results_df['Prediction'].map('{:,.2f}'.format)  # Format with commas and 2 decimal places
+                st.dataframe(results_df['Prediction'].style.set_properties(**{'text-align': 'right'})) # Align to the right
                 st.dataframe(results_df)
             else:
                 # Get the selected model and make a prediction
