@@ -3,6 +3,10 @@ import pandas as pd
 import joblib
 from sklearn.preprocessing import OneHotEncoder
 
+import joblib
+
+joblib.dump(preprocessor, 'preprocessor.pkl')
+
 # Load all models into a dictionary
 models = {
     "SGD": joblib.load('sgd_best_model.pkl'),
@@ -45,11 +49,10 @@ if st.button("Predict"):
             new_data_encoded = pd.concat([new_data_encoded, missing_data], axis=1)
 
             new_data_encoded = new_data_encoded[feature_names]
-
-            new_data_encoded['year'] = pd.to_datetime(new_data_encoded['year'], format='%Y').apply(lambda date: date.toordinal()) # Convert 'year' to ordinal
-
-            new_data_scaled = scaler.transform(new_data_encoded)  # Scale the data
-
+            # Convert 'year' to ordinal before scaling
+            new_data_encoded['year'] = pd.to_datetime(new_data_encoded['year'], format='%Y', errors='coerce').apply(lambda date: date.toordinal() if pd.notnull(date) else 0) 
+            # Scale the data
+            new_data_scaled = scaler.transform(new_data_encoded)
             # 3. Get the selected model from the dictionary
             model = models[model_choice]
 
