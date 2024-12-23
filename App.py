@@ -1,3 +1,4 @@
+
 import streamlit as st
 import pandas as pd
 import joblib
@@ -34,24 +35,37 @@ year = st.number_input("Enter the Year (e.g., 2023):", min_value=1900, max_value
 if st.button("Predict"):
     if area and year:
         try:
-            # 1. Create DataFrame
-            new_data = pd.DataFrame({'area': [area], 'year': [year]})
-            # convert year to datetime format
-            new_data['Year'] = pd.to_datetime(new_data['Year'], format='%Y')
-            #standardize Column Names
-            new_data.columns = new_data.columns.str.strip().str.lower().str.replace(' ', '_').str.replace('\W', '')
+            # Prepare Input Data:
+            new_data = pd.DataFrame({'area': [area], 'year': [year]})  # Replace with your desired area and year
 
-            # 2. Preprocess using the ORIGINAL preprocessor
-            new_data_transformed = preprocessor.transform(new_data)
-            # Convert 'year' to ordinal before scaling
-            new_data_encoded['year'] = pd.to_datetime(new_data_encoded['year'], format='%Y', errors='coerce').apply(lambda date: date.toordinal() if pd.notnull(date) else 0)
-            new_data_encoded['year'] = pd.to_numeric(new_data_encoded['year'], errors='coerce').fillna(0).astype(int)  # Ensure numerical type
+            # 1. Encode 'area':
+            new_data_encoded = pd.get_dummies(new_data, columns=['area'], drop_first=True)
+
+            # Get feature names from ColumnTransformer
+            feature_names = preprocessor.get_feature_names_out()
+
+            # 2. Handle missing columns (if any) to match training data:
+            missing_cols = set(feature_names) - set(new_data_encoded.columns)
+            # Create a DataFrame for missing columns with 0 values
+            missing_data = pd.DataFrame(0, index=new_data_encoded.index, columns=list(missing_cols))
+
+            # Concatenate the missing columns with the existing DataFrame
+            new_data_encoded = pd.concat([new_data_encoded, missing_data], axis=1)
+
+            new_data_encoded = new_data_encoded[feature_names]  # Reorder columns to match training data
+
+            # 3. Scale features:
+            new_data_scaled = scaler.transform(new_data_encoded)  # Use the same scaler used during training
+
+            # 4. Make Predictions:
+            #predicted_emission = lgb_grid.best_estimator_.predict(new_data_scaled)
+            #print(f"Predicted Total Emission for {new_data['area'][0]}: {predicted_emission[0]}")
 
             # 3. Get selected model
             model = models[model_choice]
 
             # 4. Make predictions
-            prediction = model.predict(new_data_transformed)[0]  # Use transformed data
+            prediction = model.predict(new_data_scaled)[0]  # Use transformed data
 
             # 5. Display result
             st.success(f"Predicted Total CO2 Emission for {area} in {year}: {prediction:.2f}")
