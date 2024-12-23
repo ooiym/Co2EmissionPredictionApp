@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import joblib
 from sklearn.preprocessing import OneHotEncoder
+
 # Load all models into a dictionary
 models = {
     "SGD": joblib.load('sgd_best_model.pkl'),
@@ -30,10 +31,10 @@ year = st.number_input("Enter the Year (e.g., 2023):", min_value=1900, max_value
 # Predict button
 if st.button("Predict"):
     if area and year:
-        #try:
+        try:
             # 1. Create a DataFrame for the new data
             new_data = pd.DataFrame({'area': [area], 'year': [year]})
-            st.write("Datatype of 'year':", new_data['year'].dtypes) 
+
             # 2. Preprocess the new data (similar to your code)
             new_data_encoded = pd.get_dummies(new_data, columns=['area'], drop_first=True)
 
@@ -41,12 +42,18 @@ if st.button("Predict"):
 
             missing_cols = set(feature_names) - set(new_data_encoded.columns)
             missing_data = pd.DataFrame(0, index=new_data_encoded.index, columns=list(missing_cols))
-            new_data_encoded = pd.concat([new_data_encoded, missing_data], axis=1)
+            new_data_encoded = new_data_encoded[feature_names]  # Reorder columns to match training data
 
-            new_data_encoded = new_data_encoded[feature_names]
+            st.write(new_data_encoded.columns)  # Print columns for debugging
+
+            # Check if 'year' is in feature_names and add if necessary
+            if 'year' not in feature_names:
+                feature_names = np.append(feature_names, 'year')
+                new_data_encoded = new_data_encoded.reindex(columns=feature_names, fill_value=0)  # Add missing columns with 0
+
             # Convert 'year' to ordinal before scaling
-            new_data_encoded['year'] = pd.to_datetime(new_data_encoded['year'], format='%Y', errors='coerce').apply(lambda date: date.toordinal() if pd.notnull(date) else 0) 
-            
+            new_data_encoded['year'] = pd.to_datetime(new_data_encoded['year'], format='%Y', errors='coerce').apply(lambda date: date.toordinal() if pd.notnull(date) else 0)
+            new_data_encoded['year'] = pd.to_numeric(new_data_encoded['year'], errors='coerce').fillna(0).astype(int)  # Ensure numerical type
             # Scale the data
             new_data_scaled = scaler.transform(new_data_encoded)
             # 3. Get the selected model from the dictionary
@@ -57,7 +64,7 @@ if st.button("Predict"):
 
             # 5. Display the result
             st.success(f"Predicted Total CO2 Emission for {area} in {year}: {prediction:.2f}")
-        #except Exception as e:
-            #st.error(f"Error during prediction: {e}")
+        except Exception as e:
+            st.error(f"Error during prediction: {e}")
     else:
-        st.warning("Please provide valid inputs for both Area and Year.")
+          st.warning("Please provide valid inputs for both Area and Year.")
