@@ -39,19 +39,23 @@ year = st.number_input("Enter the Year (e.g., 2023):", min_value=1900, max_value
 if st.button("Predict"):
     if area and year:
         try:
-            # Prepare Input Data:
             new_data = pd.DataFrame({'area': [area], 'year': [year]})
-            
-            # 1. Transform using preprocessor (includes encoding and column handling):
-            #new_data_transformed = preprocessor.transform(new_data)
-            new_data_encoded = pd.get_dummies(new_data, columns=['area'], drop_first=True)
 
-            # 2. Convert to DataFrame with correct column names:
-            feature_names = preprocessor.get_feature_names_out() 
-            new_data_encoded = pd.DataFrame(new_data_transformed, columns=feature_names)
-            
-            # 3. Scale features:
+            # Encode 'area':
+            new_data_encoded = pd.get_dummies(new_data, columns=['area'], drop_first=True)
+            #new_data_encoded = preprocessor.transform(new_data)
+            # Get feature names from ColumnTransformer
+            feature_names = preprocessor.get_feature_names_out()
+    
+            # Handle missing columns (if any) to match training data:
+            missing_cols = set(feature_names) - set(new_data_encoded.columns)
+            missing_data = pd.DataFrame(0, index=new_data_encoded.index, columns=list(missing_cols))
+            new_data_encoded = pd.concat([new_data_encoded, missing_data], axis=1)
+            new_data_encoded = new_data_encoded[feature_names]  # Reorder columns to match training data
+    
+            # Scale features:
             new_data_scaled = scaler.transform(new_data_encoded)
+            
             # Handle missing columns (if any) to match training data:
             missing_cols = set(feature_names) - set(new_data_encoded.columns)
             missing_data = pd.DataFrame(0, index=new_data_encoded.index, columns=list(missing_cols))
