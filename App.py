@@ -57,7 +57,7 @@ if st.button("Predict"):
 
             # 5. Display the result
             st.success(f"Predicted Total CO2 Emission for {area} in {year}: {prediction:.2f}")
-        #except Exception as e:
-            #st.error(f"Error during prediction: {e}")
+        except Exception as e:
+            st.error(f"Error during prediction: {e}")
     #else:
         #st.warning("Please provide valid inputs for both Area and Year.")
