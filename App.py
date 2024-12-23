@@ -30,7 +30,7 @@ year = st.number_input("Enter the Year (e.g., 2023):", min_value=1900, max_value
 # Predict button
 if st.button("Predict"):
     if area and year:
-        try:
+        #try:
             # 1. Create a DataFrame for the new data
             new_data = pd.DataFrame({'area': [area], 'year': [year]})
             st.write("Datatype of 'year':", new_data['year'].dtypes) 
@@ -57,7 +57,7 @@ if st.button("Predict"):
 
             # 5. Display the result
             st.success(f"Predicted Total CO2 Emission for {area} in {year}: {prediction:.2f}")
-        except Exception as e:
-            st.error(f"Error during prediction: {e}")
-    #else:
-        #st.warning("Please provide valid inputs for both Area and Year.")
+        #except Exception as e:
+            #st.error(f"Error during prediction: {e}")
+    else:
+        st.warning("Please provide valid inputs for both Area and Year.")
