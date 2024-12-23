@@ -2,7 +2,7 @@
 import streamlit as st
 import pandas as pd
 import joblib
-from sklearn.preprocessing import StandardScaler, OneHotEncoder
+from sklearn.preprocessing import StandardScaler, OneHotEncoder, scaler
 
 # Load Models and Preprocessor
 models = {
