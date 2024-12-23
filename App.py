@@ -8,6 +8,8 @@ from sklearn.preprocessing import StandardScaler, OneHotEncoder
 models = {
     "SGD": joblib.load('sgd_best_model.pkl'),
     "LightGBM": joblib.load('lgb_best_model.pkl'),
+    "Lasso": joblib.load('best_lasso_model.pkl'),
+    "Elastic Net": joblib.load('best_elasticnet_model.pkl'),
 }
 preprocessor = joblib.load('preprocessor.pkl')
 scaler = joblib.load('scaler.pkl')  # Load the scaler
