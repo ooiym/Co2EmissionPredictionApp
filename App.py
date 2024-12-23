@@ -3,6 +3,9 @@ import pandas as pd
 import joblib
 from sklearn.preprocessing import OneHotEncoder
 
+import joblib
+
+joblib.dump(preprocessor, 'preprocessor.pkl')
 
 # Load all models into a dictionary
 models = {
@@ -10,7 +13,7 @@ models = {
     "LightGBM": joblib.load('lgb_best_model.pkl'),
     # Add more models here in the future...
 }
-
+preprocessor = joblib.load('preprocessor.pkl')  # Load the preprocessor
 encoder = OneHotEncoder(sparse_output=False, handle_unknown='ignore')
 
 # Title of the app
