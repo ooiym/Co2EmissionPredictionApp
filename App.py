@@ -33,7 +33,7 @@ if st.button("Predict"):
         try:
             # 1. Create a DataFrame for the new data
             new_data = pd.DataFrame({'area': [area], 'year': [year]})
-
+            st.write("Datatype of 'year':", new_data['year'].dtypes) 
             # 2. Preprocess the new data (similar to your code)
             new_data_encoded = pd.get_dummies(new_data, columns=['area'], drop_first=True)
 
