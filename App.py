@@ -10,7 +10,7 @@ models = {
     "LightGBM": joblib.load('lgb_best_model.pkl'),
 }
 preprocessor = joblib.load('preprocessor.pkl')
-
+scaler = joblib.load('scaler.pkl')  # Load the scaler
 encoder = OneHotEncoder(sparse_output=False, handle_unknown='ignore')
 
 # Title of the app
