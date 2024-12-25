@@ -11,7 +11,7 @@ models = {
     "Elastic Net": joblib.load('best_elasticnet_model.pkl'),
 }
 preprocessor = joblib.load('preprocessor.pkl')
-scaler = joblib.load('scaler.pkl')  # Load the scaler
+scaler = joblib.load('scaler.pkl')
 # Load areas from text file
 try:
     with open('areas.txt', 'r') as file:
@@ -36,34 +36,71 @@ model_choice = st.selectbox("Select Model:", ["All Models"] + list(models.keys()
 area = st.selectbox("Select the Area:", area_list)
 year = st.number_input("Enter the Year (e.g., 2023):", min_value=1900, max_value=2100, step=1)
 
+# Input fields for additional features
+savanna_fires = st.number_input("Savanna Fires:", min_value=0.0)
+forestland = st.number_input("Forestland:", min_value=0.0)
+urban_population = st.number_input("Urban Population:", min_value=0.0)
+average_temperature = st.number_input("Average Temperature (°C):", min_value=-50.0) 
+
+# forest_fires = st.number_input("Forest Fires:", min_value=0.0)
+# crop_residues = st.number_input("Crop Residues:", min_value=0.0)
+# rice_cultivation = st.number_input("Rice Cultivation:", min_value=0.0)
+# drained_organic_soils = st.number_input("Drained Organic Soils (CO2):", min_value=0.0)
+# pesticides_manufacturing = st.number_input("Pesticides Manufacturing:", min_value=0.0)
+# food_transport = st.number_input("Food Transport:", min_value=0.0)
+# manure_management = st.number_input("Manure Management:", min_value=0.0)
+# fires_in_organic_soils = st.number_input("Fires in Organic Soils:", min_value=0.0)
+# fires_in_humid_tropical_forests = st.number_input("Fires in Humid Tropical Forests:", min_value=0.0)
+# on_farm_energy_use = st.number_input("On-Farm Energy Use:", min_value=0.0)
+# rural_population = st.number_input("Rural Population:", min_value=0.0)
+# total_population_male = st.number_input("Total Population - Male:", min_value=0.0)
+# total_population_female = st.number_input("Total Population - Female:", min_value=0.0)
+
 if st.button("Predict"):
     if area and year:
         try:
-            new_data = pd.DataFrame({'area': [area], 'year': [year]})
+            # Create a DataFrame with all input data
+            new_data = pd.DataFrame({
+                'area': [area],
+                'year': [year],
+                'savanna_fires': [savanna_fires],
+                'forest_fires': [0],
+                'crop_residues': [0],
+                'rice_cultivation': [0],
+                'drained_organic_soils_(co2)': [0],
+                'pesticides_manufacturing': [0],
+                'food_transport': [0],
+                'forestland': [forestland],
+                'manure_management': [0],
+                'fires_in_organic_soils': [0],
+                'fires_in_humid_tropical_forests': [0],
+                'on-farm_energy_use': [0],
+                'food_household_consumption': [0], 
+                'food_processing': [0], 
+                'on-farm_electricity_use': [0], 
+                'agrifood_systems_waste_disposal': [0], 
+                'fertilizers_manufacturing': [0], 
+                'total_population_-male': [0], 
+                'savanna_fires': [0], 
+                'drained_organic_soils(co2)': [0], 
+                'rice_cultivation': [0], 
+                'rural_population': [0], 
+                'urban_population': [urban_population], 
+                'average_temperature_°c': [average_temperature], 
+                'food_retail': [0], 
+                'food_packaging': [0], 
+                'net_forest_conversion': [0], 
+                'manure_left_on_pasture': [0], 
+                'total_population_-_male': [0],
+                'total_population_-_female': [0] 
+            })
 
-            # Encode 'area':
-            new_data_encoded = pd.get_dummies(new_data, columns=['area'], drop_first=True)
-            #new_data_encoded = preprocessor.transform(new_data)
-            # Get feature names from ColumnTransformer
-            feature_names = preprocessor.get_feature_names_out()
-    
-            # Handle missing columns (if any) to match training data:
-            missing_cols = set(feature_names) - set(new_data_encoded.columns)
-            missing_data = pd.DataFrame(0, index=new_data_encoded.index, columns=list(missing_cols))
-            new_data_encoded = pd.concat([new_data_encoded, missing_data], axis=1)
-            new_data_encoded = new_data_encoded[feature_names]  # Reorder columns to match training data
-    
-            # Scale features:
-            new_data_scaled = scaler.transform(new_data_encoded)
-            
-            # Handle missing columns (if any) to match training data:
-            missing_cols = set(feature_names) - set(new_data_encoded.columns)
-            missing_data = pd.DataFrame(0, index=new_data_encoded.index, columns=list(missing_cols))
-            new_data_encoded = pd.concat([new_data_encoded, missing_data], axis=1)
-            new_data_encoded = new_data_encoded[feature_names]  # Reorder columns to match training data
+            # Preprocess the data (adjust this based on your preprocessor)
+            # Assuming preprocessor handles all features
+            new_data_transformed = preprocessor.transform(new_data) 
 
-            # Scale features:
-            new_data_scaled = scaler.transform(new_data_encoded)
+            # Scale features
+            new_data_scaled = scaler.transform(new_data_transformed)
 
             if model_choice == "All Models":
                 # Display predictions for all models
@@ -77,8 +114,7 @@ if st.button("Predict"):
                 # Optionally, display as a DataFrame
                 st.write("Prediction Summary:")
                 results_df = pd.DataFrame.from_dict(results, orient='index', columns=['Prediction'])
-                results_df['Prediction'] = results_df['Prediction'].map('{:,.2f}'.format)  # Format with commas and 2 decimal places
-                # Align the 'Prediction' column to the right
+                results_df['Prediction'] = results_df['Prediction'].map('{:,.2f}'.format)
                 results_df = results_df.style.set_properties(subset=['Prediction'], **{'text-align': 'right'})
                 st.dataframe(results_df)
             else:
@@ -89,4 +125,4 @@ if st.button("Predict"):
         except Exception as e:
             st.error(f"Error during prediction: {e}")
     else:
-        st.warning("Please provide valid inputs for both Area and Year.")
+        st.warning("Please provide valid inputs for all fields.")
