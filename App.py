@@ -127,6 +127,9 @@ if st.button("Predict"):
                 'total_population_-_female': [0] 
             })
 
+            catboost_data = new_data
+            # Ensure 'area' is treated as a categorical feature by CatBoost
+            catboost_data['area'] = catboost_data['area'].astype(object) 
             
             # Preprocess the data (adjust this based on your preprocessor)
             # Assuming preprocessor handles all features
@@ -145,7 +148,8 @@ if st.button("Predict"):
                 for model_name, model in models.items():
                     if model_choice == "CatBoost":
                         prediction = models["CatBoost"].predict(new_data, cat_features=['area'])[0]
-                    prediction = model.predict(new_data_scaled)[0]
+                    else:
+                        prediction = model.predict(new_data_scaled)[0]
                     results[model_name] = prediction
                     st.write(f"{model_name}: {prediction:.2f}")
 
@@ -157,11 +161,11 @@ if st.button("Predict"):
                 st.dataframe(results_df)
             else:
                 # Get the selected model and make a prediction
-                model = models[model_choice]
+                # model = models[model_choice]
                 if model_choice == "CatBoost":
-                    prediction = models["CatBoost"].predict(new_data, cat_features=['area'])[0]
+                    prediction = models["CatBoost"].predict(catboost_data, cat_features=['area'])[0]
                 else:
-                    prediction = model.predict(new_data_scaled)[0]
+                    prediction = models[model_choice].predict(new_data_scaled)[0]  
                 st.success(f"Predicted Total CO2 Emission for {area} in {year} using {model_choice}: {prediction:.2f}")
         except Exception as e:
             st.error(f"Error during prediction: {e}")
