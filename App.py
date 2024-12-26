@@ -129,7 +129,7 @@ if st.button("Predict"):
 
             catboost_data = new_data.copy()
             # Ensure 'area' is treated as a categorical feature by CatBoost
-            catboost_data['area'] = catboost_data['area'].astype(object) 
+            catboost_data['area'] = catboost_data['area'].astype(str)
             
             # Preprocess the data (adjust this based on your preprocessor)
             # Assuming preprocessor handles all features
@@ -145,7 +145,6 @@ if st.button("Predict"):
                 for model_name, model in models.items():
                     if model_name == "CatBoost":
                         # Ensure 'area' is treated as categorical
-                        catboost_data['area'] = catboost_data['area'].astype(str)
                         prediction = model.predict(catboost_data)[0]
                     else:
                         prediction = model.predict(new_data_scaled)[0]
@@ -154,7 +153,6 @@ if st.button("Predict"):
             else:
                 # Get the selected model and make a prediction
                 if model_choice == "CatBoost":
-                    #catboost_data['area'] = catboost_data['area'].astype(str)
                     prediction = models["CatBoost"].predict(catboost_data)[0]
                 else:
                     prediction = models[model_choice].predict(new_data_scaled)[0]
