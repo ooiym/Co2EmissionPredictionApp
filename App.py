@@ -138,9 +138,6 @@ if st.button("Predict"):
             # Scale features
             new_data_scaled = scaler.transform(new_data_transformed)
 
-            # Treat 'area' as categorical 
-            new_data['area'] = new_data['area'].astype(object)
-            
             if model_choice == "All Models":
                 # Display predictions for all models
                 st.subheader("Predictions from All Models:")
