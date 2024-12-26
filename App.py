@@ -127,6 +127,7 @@ if st.button("Predict"):
                 'total_population_-_female': [0] 
             })
 
+            
             # Preprocess the data (adjust this based on your preprocessor)
             # Assuming preprocessor handles all features
             new_data_transformed = preprocessor.transform(new_data) 
@@ -134,11 +135,16 @@ if st.button("Predict"):
             # Scale features
             new_data_scaled = scaler.transform(new_data_transformed)
 
+            # Treat 'area' as categorical 
+            new_data['area'] = new_data['area'].astype(object)
+            
             if model_choice == "All Models":
                 # Display predictions for all models
                 st.subheader("Predictions from All Models:")
                 results = {}
                 for model_name, model in models.items():
+                    if model_choice == "CatBoost":
+                        prediction = models["CatBoost"].predict(new_data, cat_features=['area'])[0]
                     prediction = model.predict(new_data_scaled)[0]
                     results[model_name] = prediction
                     st.write(f"{model_name}: {prediction:.2f}")
@@ -152,7 +158,10 @@ if st.button("Predict"):
             else:
                 # Get the selected model and make a prediction
                 model = models[model_choice]
-                prediction = model.predict(new_data_scaled)[0]
+                if model_choice == "CatBoost":
+                    prediction = models["CatBoost"].predict(new_data, cat_features=['area'])[0]
+                else:
+                    prediction = model.predict(new_data_scaled)[0]
                 st.success(f"Predicted Total CO2 Emission for {area} in {year} using {model_choice}: {prediction:.2f}")
         except Exception as e:
             st.error(f"Error during prediction: {e}")
