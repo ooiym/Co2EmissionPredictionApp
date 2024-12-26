@@ -154,7 +154,7 @@ if st.button("Predict"):
             else:
                 # Get the selected model and make a prediction
                 if model_choice == "CatBoost":
-                    catboost_data['area'] = catboost_data['area'].astype(str)
+                    #catboost_data['area'] = catboost_data['area'].astype(str)
                     prediction = models["CatBoost"].predict(catboost_data)[0]
                 else:
                     prediction = models[model_choice].predict(new_data_scaled)[0]
