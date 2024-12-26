@@ -143,10 +143,10 @@ if st.button("Predict"):
                 st.subheader("Predictions from All Models:")
                 results = {}
                 for model_name, model in models.items():
-                    if model_choice == "CatBoost":
+                    if model_name == "CatBoost":
                         # Ensure 'area' is treated as categorical
                         catboost_data['area'] = catboost_data['area'].astype(str)  # Convert area to string if it's categorical
-                        prediction = models["CatBoost"].predict(catboost_data)[0]
+                        prediction = model.predict(catboost_data, cat_features=['area'])[0] 
                     else:
                         prediction = models[model_choice].predict(new_data_scaled)[0]
                     results[model_name] = prediction
@@ -162,9 +162,11 @@ if st.button("Predict"):
                 # Get the selected model and make a prediction
                 # model = models[model_choice]
                 if model_choice == "CatBoost":
-                    prediction = models["CatBoost"].predict(catboost_data, cat_features=['area'])[0]
+                    # Ensure 'area' is treated as categorical
+                    catboost_data['area'] = catboost_data['area'].astype(str)  # Convert area to string if it's categorical
+                    prediction = models["CatBoost"].predict(catboost_data)[0]
                 else:
-                    prediction = models[model_choice].predict(new_data_scaled)[0]  
+                    prediction = models[model_choice].predict(new_data_scaled)[0]
                 st.success(f"Predicted Total CO2 Emission for {area} in {year} using {model_choice}: {prediction:.2f}")
         except Exception as e:
             st.error(f"Error during prediction: {e}")
