@@ -22,35 +22,61 @@ except FileNotFoundError:
     st.error("The 'areas.txt' file is missing. Please add it to the working directory.")
     area_list = []
 
-# --- Theme Selection ---
-st.sidebar.subheader("Theme")
-theme = st.sidebar.selectbox("Select Theme", ["Dark", "Light"])
-if theme == "Light":
-    st.markdown(
-        """
-        <style>
-        .stApp{
-            background-color: #f0f0f0;
-            color: #000000;
-        }
-        .stTextInput > div > div > input {
-            color: #000000;
-        }
-        .stSelectbox label, .stNumberInput label{
-            color: #000000; 
-        }
-        .stButton > button > div > p {
-            color: white; 
-        }
-        .stSidebar{
-            background-color: #BCCCDC;
-        }
-        
-       </style>
-       """,
-       unsafe_allow_html=True,
-    )
+# Define themes as CSS strings
+dark_theme_css = """
+<style>
+    .stApp {
+        background-color: #1e1e1e;
+        color: #ffffff;
+    }
+    .stSidebar {
+        background-color: #2c2c2c;
+    }
+    .stTextInput > div > div > input, .stSelectbox > div > div > div > div {
+        color: #ffffff;
+    }
+    .stButton > button {
+        background-color: #4caf50;
+        color: white;
+        border: none;
+    }
+    .stButton > button:hover {
+        background-color: #45a049;
+    }
+</style>
+"""
 
+light_theme_css = """
+<style>
+    .stApp {
+        background-color: #ffffff;
+        color: #000000;
+    }
+    .stSidebar {
+        background-color: #f0f0f0;
+    }
+    .stTextInput > div > div > input, .stSelectbox > div > div > div > div {
+        color: #000000;
+    }
+    .stButton > button {
+        background-color: #4caf50;
+        color: black;
+    }
+    .stButton > button:hover {
+        background-color: #45a049;
+    }
+</style>
+"""
+
+# Add theme selection in the sidebar
+theme_choice = st.sidebar.selectbox("Select Theme", ["Dark", "Light"])
+
+# Apply the chosen theme
+if theme_choice == "Dark":
+    st.markdown(dark_theme_css, unsafe_allow_html=True)
+else:
+    st.markdown(light_theme_css, unsafe_allow_html=True)
+    
 # Title of the app
 st.title("CO2 Emission Prediction App")
 
