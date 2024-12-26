@@ -144,11 +144,11 @@ if st.button("Predict"):
                 results = {}
                 for model_name, model in models.items():
                     if model_name == "CatBoost":
-                        # Ensure 'area' is treated as categorical
-                        catboost_data['area'] = catboost_data['area'].astype(str)  # Convert area to string if it's categorical
+                        # Predict using CatBoost with catboost_data
                         prediction = model.predict(catboost_data, cat_features=['area'])[0] 
                     else:
-                        prediction = models[model_choice].predict(new_data_scaled)[0]
+                        # Predict using other models with new_data_scaled
+                        prediction = model.predict(new_data_scaled)[0]  
                     results[model_name] = prediction
                     st.write(f"{model_name}: {prediction:.2f}")
 
