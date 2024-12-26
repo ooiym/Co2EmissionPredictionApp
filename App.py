@@ -9,6 +9,8 @@ models = {
     "LightGBM": joblib.load('lgb_best_model.pkl'),
     "Lasso": joblib.load('lasso_model.pkl'),
     "Elastic Net": joblib.load('elasticnet_model.pkl'),
+    "XGBoost": joblib.load('xgboost_model.pkl'),
+    "CatBoost": joblib.load('catboost_model.pkl'),
 }
 preprocessor = joblib.load('preprocessor.pkl')
 scaler = joblib.load('scaler.pkl')
