@@ -127,7 +127,7 @@ if st.button("Predict"):
                 'total_population_-_female': [0] 
             })
 
-            catboost_data = new_data
+            catboost_data = new_data.copy()
             # Ensure 'area' is treated as a categorical feature by CatBoost
             catboost_data['area'] = catboost_data['area'].astype(object) 
             
