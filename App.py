@@ -20,6 +20,34 @@ except FileNotFoundError:
     st.error("The 'areas.txt' file is missing. Please add it to the working directory.")
     area_list = []
 
+# --- Theme Selection ---
+st.sidebar.subheader("Theme")
+theme = st.sidebar.selectbox("Select Theme", ["Light", "Dark"])
+if theme == "Light":
+    st.markdown(
+        """
+        <style>
+        .stApp{
+            background-color: #f0f0f0;
+            color: #000000;
+        }
+        .stTextInput > div > div > input {
+            color: #000000;
+        }
+        .stSelectbox label, .stNumberInput label{
+            color: #000000; 
+        }
+        .stButton > button > div > p {
+            color: white; 
+        }
+        .stSidebar{
+            background-color: #BCCCDC;
+        }
+        
+       </style>
+       """,
+       unsafe_allow_html=True,
+    )
 
 # Title of the app
 st.title("CO2 Emission Prediction App")
