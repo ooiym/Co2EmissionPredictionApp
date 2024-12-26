@@ -24,7 +24,7 @@ except FileNotFoundError:
 
 # --- Theme Selection ---
 st.sidebar.subheader("Theme")
-theme = st.sidebar.selectbox("Select Theme", ["Light", "Dark"])
+theme = st.sidebar.selectbox("Select Theme", ["Dark", "Light"])
 if theme == "Light":
     st.markdown(
         """
